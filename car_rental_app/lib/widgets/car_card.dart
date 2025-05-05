@@ -73,7 +73,9 @@ class CarCard extends StatelessWidget {
                           ),
                           child: IconButton(
                             icon: Icon(
-                              isFavorite ? Icons.favorite : Icons.favorite_border,
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
                               color: isFavorite ? Colors.red : null,
                             ),
                             onPressed: onFavoriteToggle,
@@ -129,9 +131,12 @@ class CarCard extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               car.category,
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: Colors.grey[600],
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                             ),
                           ],
                         ),
@@ -141,10 +146,13 @@ class CarCard extends StatelessWidget {
                         children: [
                           Text(
                             '${car.price.toStringAsFixed(2)}€',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: Theme.of(context).primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  color: Theme.of(context).primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                           const Text('/ jour'),
                         ],
@@ -167,9 +175,10 @@ class CarCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           car.rating.toStringAsFixed(1),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                       ],
                     ],
@@ -182,13 +191,15 @@ class CarCard extends StatelessWidget {
                       children: car.features.take(3).map((feature) {
                         return Chip(
                           label: Text(feature),
-                          backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                          backgroundColor:
+                              Theme.of(context).primaryColor.withOpacity(0.1),
                           labelStyle: TextStyle(
                             color: Theme.of(context).primaryColor,
                             fontSize: 12,
                           ),
                           padding: EdgeInsets.zero,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
                         );
                       }).toList(),
                     ),
@@ -201,4 +212,4 @@ class CarCard extends StatelessWidget {
       ),
     );
   }
-} 
+}

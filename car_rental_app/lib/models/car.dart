@@ -3,124 +3,58 @@ class Car {
   final String brand;
   final String model;
   final int year;
-  final String category;
-  final List<String> images;
-  final double price;
+  final double pricePerDay;
+  final String image;
+  final bool available;
   final String description;
-  final String ownerId;
-  final bool isAvailable;
-  final DateTime availableFrom;
-  final DateTime availableTo;
-  final List<String> features;
   final String location;
-  final double rating;
-  final List<Review> reviews;
-  final bool isActive;
+  final String ownerId;
+  final String ownerName;
+  final String ownerEmail;
 
   Car({
     required this.id,
     required this.brand,
     required this.model,
     required this.year,
-    required this.category,
-    required this.images,
-    required this.price,
+    required this.pricePerDay,
+    required this.image,
+    required this.available,
     required this.description,
-    required this.ownerId,
-    this.isAvailable = true,
-    required this.availableFrom,
-    required this.availableTo,
-    required this.features,
     required this.location,
-    this.rating = 0.0,
-    List<Review>? reviews,
-    this.isActive = true,
-  }) : reviews = reviews ?? [];
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'brand': brand,
-      'model': model,
-      'year': year,
-      'category': category,
-      'images': images,
-      'price': price,
-      'description': description,
-      'ownerId': ownerId,
-      'isAvailable': isAvailable,
-      'availableFrom': availableFrom.toIso8601String(),
-      'availableTo': availableTo.toIso8601String(),
-      'features': features,
-      'location': location,
-      'rating': rating,
-      'reviews': reviews.map((review) => review.toJson()).toList(),
-      'isActive': isActive,
-    };
-  }
+    required this.ownerId,
+    required this.ownerName,
+    required this.ownerEmail,
+  });
 
   factory Car.fromJson(Map<String, dynamic> json) {
     return Car(
-      id: json['id'] as String,
-      brand: json['brand'] as String,
-      model: json['model'] as String,
-      year: json['year'] as int,
-      category: json['category'] as String,
-      images: List<String>.from(json['images']),
-      price: json['price'] as double,
-      description: json['description'] as String,
-      ownerId: json['ownerId'] as String,
-      isAvailable: json['isAvailable'] as bool,
-      availableFrom: DateTime.parse(json['availableFrom'] as String),
-      availableTo: DateTime.parse(json['availableTo'] as String),
-      features: List<String>.from(json['features']),
-      location: json['location'] as String,
-      rating: json['rating'] as double? ?? 0.0,
-      reviews: (json['reviews'] as List<dynamic>?)
-          ?.map((review) => Review.fromJson(review as Map<String, dynamic>))
-          .toList() ?? [],
-      isActive: json['isActive'] as bool? ?? true,
+      id: json['_id'],
+      brand: json['brand'],
+      model: json['model'],
+      year: json['year'],
+      pricePerDay: json['pricePerDay'].toDouble(),
+      image: json['image'],
+      available: json['available'],
+      description: json['description'],
+      location: json['location'],
+      ownerId: json['owner']['_id'],
+      ownerName: json['owner']['name'],
+      ownerEmail: json['owner']['email'],
     );
   }
 
-  Car copyWith({
-    String? id,
-    String? brand,
-    String? model,
-    int? year,
-    String? category,
-    List<String>? images,
-    double? price,
-    String? description,
-    String? ownerId,
-    bool? isAvailable,
-    DateTime? availableFrom,
-    DateTime? availableTo,
-    List<String>? features,
-    String? location,
-    double? rating,
-    List<Review>? reviews,
-    bool? isActive,
-  }) {
-    return Car(
-      id: id ?? this.id,
-      brand: brand ?? this.brand,
-      model: model ?? this.model,
-      year: year ?? this.year,
-      category: category ?? this.category,
-      images: images ?? this.images,
-      price: price ?? this.price,
-      description: description ?? this.description,
-      ownerId: ownerId ?? this.ownerId,
-      isAvailable: isAvailable ?? this.isAvailable,
-      availableFrom: availableFrom ?? this.availableFrom,
-      availableTo: availableTo ?? this.availableTo,
-      features: features ?? this.features,
-      location: location ?? this.location,
-      rating: rating ?? this.rating,
-      reviews: reviews ?? this.reviews,
-      isActive: isActive ?? this.isActive,
-    );
+  Map<String, dynamic> toJson() {
+    return {
+      'brand': brand,
+      'model': model,
+      'year': year,
+      'pricePerDay': pricePerDay,
+      'image': image,
+      'description': description,
+      'location': location,
+      'owner': ownerId,
+    };
   }
 }
 
@@ -158,4 +92,4 @@ class Review {
       date: DateTime.parse(json['date'] as String),
     );
   }
-} 
+}

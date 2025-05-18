@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:car_rental_app/services/auth_service.dart';
+import 'package:provider/provider.dart';
+import 'package:car_rental_app/providers/auth_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -21,7 +22,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
-        await AuthService.register(
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        await authProvider.register(
           name: _nameController.text,
           email: _emailController.text,
           password: _passwordController.text,

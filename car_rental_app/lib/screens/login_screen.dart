@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:car_rental_app/screens/main_screen.dart';
 import 'package:car_rental_app/screens/register_screen.dart';
+import 'package:car_rental_app/providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,27 +26,34 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() async {
+  Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
-      // Simuler un délai de connexion
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-
-        // Rediriger vers l'écran principal
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const MainScreen(),
-          ),
+      try {
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        await authProvider.login(
+          email: _emailController.text,
+          password: _passwordController.text,
         );
+
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/main');
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erreur: ${e.toString()}')),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -176,7 +185,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
                       : const Text('Se connecter'),
@@ -196,41 +206,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                       },
                       child: const Text('S\'inscrire'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                Row(
-                  children: const [
-                    Expanded(child: Divider()),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Text('Ou continuer avec'),
-                    ),
-                    Expanded(child: Divider()),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _SocialButton(
-                      icon: Icons.g_mobiledata,
-                      onPressed: () {
-                        // TODO: Implémenter la connexion Google
-                      },
-                    ),
-                    _SocialButton(
-                      icon: Icons.facebook,
-                      onPressed: () {
-                        // TODO: Implémenter la connexion Facebook
-                      },
-                    ),
-                    _SocialButton(
-                      icon: Icons.apple,
-                      onPressed: () {
-                        // TODO: Implémenter la connexion Apple
-                      },
                     ),
                   ],
                 ),
@@ -263,4 +238,4 @@ class _SocialButton extends StatelessWidget {
       ),
     );
   }
-} 
+}

@@ -1,74 +1,84 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'api_service.dart';
+import 'api_config.dart';
 
 class AuthService {
-  static const String _tokenKey = 'auth_token';
-  static const String _userKey = 'user_data';
+  final SharedPreferences _prefs;
 
-  // Inscription
-  static Future<Map<String, dynamic>> register({
+  AuthService(this._prefs);
+
+  Future<Map<String, dynamic>> register({
     required String name,
     required String email,
     required String password,
     required String phone,
     required String address,
   }) async {
-    final response = await ApiService.post('users/register', {
-      'name': name,
-      'email': email,
-      'password': password,
-      'phone': phone,
-      'address': address,
-    });
-    await _saveUserData(response);
-    return response;
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.baseUrl}${ApiConfig.register}'),
+        headers: ApiConfig.getHeaders(null),
+        body: jsonEncode({
+          'name': name,
+          'email': email,
+          'password': password,
+          'phone': phone,
+          'address': address,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        await _saveUserData(data);
+        return data;
+      } else {
+        throw Exception(jsonDecode(response.body)['message']);
+      }
+    } catch (e) {
+      throw Exception('Failed to register: $e');
+    }
   }
 
-  // Connexion
-  static Future<Map<String, dynamic>> login({
+  Future<Map<String, dynamic>> login({
     required String email,
     required String password,
   }) async {
-    final response = await ApiService.post('users/login', {
-      'email': email,
-      'password': password,
-    });
-    await _saveUserData(response);
-    return response;
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.baseUrl}${ApiConfig.login}'),
+        headers: ApiConfig.getHeaders(null),
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        await _saveUserData(data);
+        return data;
+      } else {
+        throw Exception(jsonDecode(response.body)['message']);
+      }
+    } catch (e) {
+      throw Exception('Failed to login: $e');
+    }
   }
 
-  // Déconnexion
-  static Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tokenKey);
-    await prefs.remove(_userKey);
+  Future<void> logout() async {
+    await _prefs.remove('user');
   }
 
-  // Récupérer le profil utilisateur
-  static Future<Map<String, dynamic>> getProfile() async {
-    return await ApiService.get('users/profile');
-  }
-
-  // Sauvegarder les données utilisateur
-  static Future<void> _saveUserData(Map<String, dynamic> userData) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_userKey, jsonEncode(userData));
-  }
-
-  // Récupérer les données utilisateur
-  static Future<Map<String, dynamic>?> getUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userData = prefs.getString(_userKey);
-    if (userData != null) {
-      return jsonDecode(userData);
+  Future<Map<String, dynamic>?> getCurrentUser() async {
+    final userJson = _prefs.getString('user');
+    if (userJson != null) {
+      return jsonDecode(userJson);
     }
     return null;
   }
 
-  // Vérifier si l'utilisateur est connecté
-  static Future<bool> isLoggedIn() async {
-    final userData = await getUserData();
-    return userData != null;
+  Future<void> _saveUserData(Map<String, dynamic> userData) async {
+    await _prefs.setString('user', jsonEncode(userData));
   }
 }

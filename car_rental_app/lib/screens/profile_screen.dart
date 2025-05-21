@@ -236,6 +236,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _updateBookingStatus(String bookingId, String status) async {
+    setState(() => _isLoading = true);
+    try {
+      await _bookingService.updateBookingStatus(bookingId, status);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text('Statut de la réservation mis à jour avec succès!')),
+        );
+        _loadUserData();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Erreur lors de la mise à jour du statut : ${e.toString()}'),
+          ),
+        );
+      }
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -289,46 +315,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Text(
-                    'Mes Réservations',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 16),
-                  _userBookings.isEmpty
-                      ? const Text('Vous n\'avez pas encore de réservations.')
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: _userBookings.length,
-                          itemBuilder: (context, index) {
-                            final booking = _userBookings[index];
-                            return Card(
-                              margin: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Voiture: ${booking.car?.brand ?? 'N/A'} ${booking.car?.model ?? 'N/A'}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                        'Du: ${booking.startDate.toLocal().toString().split(' ')[0]}'),
-                                    Text(
-                                        'Au: ${booking.endDate.toLocal().toString().split(' ')[0]}'),
-                                    Text(
-                                        'Prix Total: ${booking.totalPrice} DA'),
-                                    Text('Statut: ${booking.status}'),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                  // User Bookings Section
+                  if (!isAdmin) ...[
+                    Text(
+                      'Mes Réservations',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildUserBookingsList(),
+                  ],
+                  // Admin Bookings Section
+                  if (isAdmin) ...[
+                    Text(
+                      'Gérer Toutes les Réservations (Admin)',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildAdminBookingsList(),
+                  ],
                   const SizedBox(height: 24),
                   Text(
                     'Mes Voitures',
@@ -499,5 +503,178 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
     );
+  }
+
+  Widget _buildUserBookingsList() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (_userBookings.isEmpty) {
+      return const Text('Aucune réservation trouvée.');
+    } else {
+      final now = DateTime.now();
+      final upcomingBookings = _userBookings
+          .where((booking) => booking.endDate.isAfter(now))
+          .toList();
+      final pastBookings = _userBookings
+          .where((booking) => !booking.endDate.isAfter(now))
+          .toList();
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (upcomingBookings.isNotEmpty) ...[
+            Text('Réservations à venir',
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: upcomingBookings.length,
+              itemBuilder: (context, index) {
+                final booking = upcomingBookings[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Voiture: ${booking.car?.brand ?? 'N/A'} ${booking.car?.model ?? 'N/A'}',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text(
+                            'Du: ${booking.startDate.toLocal().toString().split(' ')[0]}'),
+                        Text(
+                            'Au: ${booking.endDate.toLocal().toString().split(' ')[0]}'),
+                        Text('Prix Total: ${booking.totalPrice} DA'),
+                        const SizedBox(height: 8),
+                        Text('Statut: ${booking.status}'),
+                        if (booking.status != 'cancelled')
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: TextButton(
+                              onPressed: () => _cancelBooking(booking.id),
+                              child: const Text('Annuler'),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+          if (pastBookings.isNotEmpty) ...[
+            Text('Réservations passées',
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: pastBookings.length,
+              itemBuilder: (context, index) {
+                final booking = pastBookings[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Voiture: ${booking.car?.brand ?? 'N/A'} ${booking.car?.model ?? 'N/A'}',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text(
+                            'Du: ${booking.startDate.toLocal().toString().split(' ')[0]}'),
+                        Text(
+                            'Au: ${booking.endDate.toLocal().toString().split(' ')[0]}'),
+                        Text('Prix Total: ${booking.totalPrice} DA'),
+                        const SizedBox(height: 8),
+                        Text('Statut: ${booking.status}'),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+          if (upcomingBookings.isEmpty && pastBookings.isEmpty)
+            const Text('Aucune réservation trouvée pour cet utilisateur.'),
+        ],
+      );
+    }
+  }
+
+  Widget _buildAdminBookingsList() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (_userBookings.isEmpty) {
+      // _userBookings contains all bookings for admin
+      return const Text('Aucune réservation trouvée dans le système.');
+    } else {
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: _userBookings.length,
+        itemBuilder: (context, index) {
+          final booking = _userBookings[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Voiture: ${booking.car?.brand ?? 'N/A'} ${booking.car?.model ?? 'N/A'}',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Text('Client: ${booking.user?['nom'] ?? 'N/A'}'),
+                  Text('Email client: ${booking.user?['email'] ?? 'N/A'}'),
+                  if (booking.user?['telephone'] != null &&
+                      booking.user!['telephone']!.isNotEmpty)
+                    Text('Téléphone client: ${booking.user!['telephone']}'),
+                  const SizedBox(height: 8),
+                  Text(
+                      'Du: ${booking.startDate.toLocal().toString().split(' ')[0]}'),
+                  Text(
+                      'Au: ${booking.endDate.toLocal().toString().split(' ')[0]}'),
+                  Text('Prix Total: ${booking.totalPrice} DA'),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text('Statut: ',
+                          style: Theme.of(context).textTheme.bodyLarge),
+                      DropdownButton<String>(
+                        value: booking.status,
+                        items: [
+                          'pending',
+                          'confirmed',
+                          'cancelled',
+                          'completed'
+                        ].map((String status) {
+                          return DropdownMenuItem<String>(
+                            value: status,
+                            child: Text(status),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          if (newValue != null && newValue != booking.status) {
+                            _updateBookingStatus(booking.id, newValue);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
   }
 }

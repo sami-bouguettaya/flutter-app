@@ -10,6 +10,7 @@ class Booking {
   final String status;
   final DateTime createdAt;
   final Car? car;
+  final Map<String, dynamic>? user;
 
   Booking({
     required this.id,
@@ -21,6 +22,7 @@ class Booking {
     required this.status,
     required this.createdAt,
     this.car,
+    this.user,
   });
 
   factory Booking.fromJson(Map<String, dynamic> json) {
@@ -34,6 +36,7 @@ class Booking {
       status: json['status'] ?? '',
       createdAt: DateTime.parse(json['createdAt']),
       car: json['car'] != null ? Car.fromJson(json['car']) : null,
+      user: json['user'] is Map<String, dynamic> ? json['user'] : null,
     );
   }
 

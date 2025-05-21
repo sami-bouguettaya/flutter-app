@@ -59,14 +59,21 @@ router.post('/', protect, async (req, res) => {
 });
 
 // @route   GET /api/bookings
-// @desc    Récupérer toutes les réservations de l'utilisateur
+// @desc    Récupérer toutes les réservations de l'utilisateur (ou toutes pour admin)
 // @access  Private
 router.get('/', protect, async (req, res) => {
   try {
-    const bookings = await Booking.find({ user: req.user._id })
-      .populate('car', 'brand model year pricePerDay images')
-      .populate('user', 'nom email')
+    let query = {};
+    // If user is not an admin, only fetch their bookings
+    if (req.user.role !== 'admin') {
+      query = { user: req.user._id };
+    }
+
+    const bookings = await Booking.find(query)
+      .populate('car', 'brand model year pricePerDay image') // Use image singular
+      .populate('user', 'nom email telephone') // Populate user details including telephone
       .sort({ createdAt: -1 });
+
     res.json(bookings);
   } catch (error) {
     res.status(500).json({ message: error.message });

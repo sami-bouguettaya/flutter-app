@@ -20,6 +20,17 @@ class _AddCarScreenState extends State<AddCarScreen> {
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController();
   final _imageController = TextEditingController();
+  String? _selectedCategory;
+  final List<String> _predefinedFeatures = [
+    'Climatisation',
+    'Bluetooth',
+    'GPS',
+    'Sièges chauffants',
+    'Toit ouvrant',
+    'Caméra de recul',
+    'Régulateur de vitesse',
+  ];
+  final List<String> _selectedFeatures = [];
 
   @override
   void dispose() {
@@ -56,6 +67,8 @@ class _AddCarScreenState extends State<AddCarScreen> {
         location: _locationController.text,
         image: _imageController.text,
         owner: user['_id'],
+        category: _selectedCategory!,
+        features: _selectedFeatures,
       );
 
       if (mounted) {
@@ -128,8 +141,8 @@ class _AddCarScreenState extends State<AddCarScreen> {
                     ),
                     TextFormField(
                       controller: _priceController,
-                      decoration:
-                          const InputDecoration(labelText: 'Prix par jour (€)'),
+                      decoration: const InputDecoration(
+                          labelText: 'Prix par jour (DA)'),
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -171,6 +184,52 @@ class _AddCarScreenState extends State<AddCarScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Veuillez entrer une URL d\'image';
+                        }
+                        return null;
+                      },
+                    ),
+                    Text('Caractéristiques',
+                        style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 4.0,
+                      children: _predefinedFeatures.map((feature) {
+                        return FilterChip(
+                          label: Text(feature),
+                          selected: _selectedFeatures.contains(feature),
+                          onSelected: (selected) {
+                            setState(() {
+                              if (selected) {
+                                _selectedFeatures.add(feature);
+                              } else {
+                                _selectedFeatures.remove(feature);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: 'Catégorie'),
+                      value: _selectedCategory,
+                      hint: const Text('Sélectionner une catégorie'),
+                      items: ['SUV', 'Sedan', 'Coupe', 'Hatchback']
+                          .map((String category) {
+                        return DropdownMenuItem<String>(
+                          value: category,
+                          child: Text(category),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedCategory = newValue;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Veuillez sélectionner une catégorie';
                         }
                         return null;
                       },

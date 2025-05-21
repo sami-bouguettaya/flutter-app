@@ -11,31 +11,31 @@ class AppTheme {
     return ThemeData(
       primaryColor: primaryColor,
       scaffoldBackgroundColor: backgroundColor,
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: primaryColor,
         secondary: secondaryColor,
-        background: backgroundColor,
+        surface: backgroundColor,
       ),
       textTheme: ThemeData.light().textTheme.copyWith(
-        displayLarge: const TextStyle(
-          color: textColor,
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-        ),
-        displayMedium: const TextStyle(
-          color: textColor,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
-        bodyLarge: const TextStyle(
-          color: textColor,
-          fontSize: 16,
-        ),
-        bodyMedium: const TextStyle(
-          color: textColor,
-          fontSize: 14,
-        ),
-      ),
+            displayLarge: const TextStyle(
+              color: textColor,
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
+            displayMedium: const TextStyle(
+              color: textColor,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+            bodyLarge: const TextStyle(
+              color: textColor,
+              fontSize: 16,
+            ),
+            bodyMedium: const TextStyle(
+              color: textColor,
+              fontSize: 14,
+            ),
+          ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,
@@ -65,7 +65,8 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.red),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
       cardTheme: CardTheme(
         color: secondaryColor,
@@ -76,4 +77,4 @@ class AppTheme {
       ),
     );
   }
-} 
+}

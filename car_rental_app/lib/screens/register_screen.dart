@@ -24,11 +24,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
         await authProvider.register(
-          name: _nameController.text,
+          nom: _nameController.text,
           email: _emailController.text,
           password: _passwordController.text,
-          phone: _phoneController.text,
-          address: _addressController.text,
+          telephone: _phoneController.text,
+          adresse: _addressController.text,
         );
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/main');

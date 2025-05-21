@@ -7,6 +7,7 @@ import 'package:car_rental_app/screens/main_screen.dart';
 import 'package:car_rental_app/screens/register_screen.dart';
 import 'package:car_rental_app/screens/add_car_screen.dart';
 import 'package:car_rental_app/screens/profile_screen.dart';
+import 'package:car_rental_app/screens/admin_cars_screen.dart';
 import 'package:car_rental_app/services/auth_service.dart';
 import 'package:car_rental_app/providers/auth_provider.dart';
 import 'package:car_rental_app/services/car_service.dart';
@@ -67,6 +68,7 @@ class MyApp extends StatelessWidget {
         },
         '/add-car': (context) => const AddCarScreen(),
         '/profile': (context) => const ProfileScreen(),
+        '/admin/cars': (context) => const AdminCarsScreen(),
       },
     );
   }

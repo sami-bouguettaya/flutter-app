@@ -5,12 +5,17 @@ class Car {
   final int year;
   final double pricePerDay;
   final String image;
+  final String category;
+  final double price;
+  final double rating;
+  final List<String> features;
   final bool available;
   final String description;
   final String location;
   final String ownerId;
   final String ownerName;
   final String ownerEmail;
+  final String? ownerPhone;
 
   Car({
     required this.id,
@@ -19,28 +24,48 @@ class Car {
     required this.year,
     required this.pricePerDay,
     required this.image,
+    required this.category,
+    required this.price,
+    required this.rating,
+    required this.features,
     required this.available,
     required this.description,
     required this.location,
     required this.ownerId,
     required this.ownerName,
     required this.ownerEmail,
+    this.ownerPhone,
   });
 
   factory Car.fromJson(Map<String, dynamic> json) {
+    print('Parsing Car JSON: $json');
+    // Safely access owner data, providing default values if owner is null
+    final ownerData = json['owner'];
+    final ownerId = ownerData != null ? ownerData['_id'] ?? '' : '';
+    final ownerName =
+        ownerData != null ? ownerData['nom'] ?? 'Unknown' : 'Unknown';
+    final ownerEmail = ownerData != null ? ownerData['email'] ?? '' : '';
+    final ownerPhone =
+        ownerData != null ? ownerData['telephone'] ?? null : null;
+
     return Car(
-      id: json['_id'],
-      brand: json['brand'],
-      model: json['model'],
-      year: json['year'],
-      pricePerDay: json['pricePerDay'].toDouble(),
-      image: json['image'],
-      available: json['available'],
-      description: json['description'],
-      location: json['location'],
-      ownerId: json['owner']['_id'],
-      ownerName: json['owner']['name'],
-      ownerEmail: json['owner']['email'],
+      id: json['_id'] ?? '',
+      brand: json['brand'] ?? '',
+      model: json['model'] ?? '',
+      year: json['year']?.toInt() ?? 0,
+      pricePerDay: json['pricePerDay']?.toDouble() ?? 0.0,
+      image: json['image'] ?? '',
+      category: json['category'] ?? '',
+      price: json['pricePerDay']?.toDouble() ?? 0.0,
+      rating: json['rating']?.toDouble() ?? 0.0,
+      features: List<String>.from(json['features'] ?? []),
+      available: json['available'] ?? true,
+      description: json['description'] ?? '',
+      location: json['location'] ?? '',
+      ownerId: ownerId,
+      ownerName: ownerName,
+      ownerEmail: ownerEmail,
+      ownerPhone: ownerPhone,
     );
   }
 
@@ -51,6 +76,11 @@ class Car {
       'year': year,
       'pricePerDay': pricePerDay,
       'image': image,
+      'category': category,
+      'price': price,
+      'rating': rating,
+      'features': features,
+      'available': available,
       'description': description,
       'location': location,
       'owner': ownerId,

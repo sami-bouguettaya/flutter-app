@@ -1,5 +1,5 @@
 class ApiConfig {
-  static const String baseUrl = 'http://172.20.10.5:5000/api';
+  static const String baseUrl = 'http://localhost:5000/api';
 
   // Auth endpoints
   static const String register = '/users/register';
@@ -8,6 +8,9 @@ class ApiConfig {
 
   // Car endpoints
   static const String cars = '/cars';
+
+  // Booking endpoints
+  static const String bookings = '/bookings';
 
   // Headers
   static Map<String, String> getHeaders(String? token) {

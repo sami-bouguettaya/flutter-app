@@ -43,7 +43,9 @@ class CarCard extends StatelessWidget {
                     top: Radius.circular(4),
                   ),
                   child: Image.network(
-                    car.images.first,
+                    car.images.isNotEmpty
+                        ? car.images.first
+                        : 'placeholder_image_url',
                     height: 200,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -145,7 +147,7 @@ class CarCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            '${car.price.toStringAsFixed(2)}€',
+                            '${car.pricePerDay.toStringAsFixed(2)}€',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium

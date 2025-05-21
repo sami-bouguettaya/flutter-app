@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:car_rental_app/theme/app_theme.dart';
 import 'package:car_rental_app/screens/login_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -31,16 +30,16 @@ class HomeScreen extends StatelessWidget {
                 Text(
                   'Bienvenue sur\nCarShare',
                   style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                    color: Colors.white,
-                    height: 1.2,
-                  ),
+                        color: Colors.white,
+                        height: 1.2,
+                      ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'Louez ou mettez en location votre voiture en toute simplicité',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.white,
-                  ),
+                        color: Colors.white,
+                      ),
                 ),
                 const SizedBox(height: 48),
                 SizedBox(
@@ -74,4 +73,4 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

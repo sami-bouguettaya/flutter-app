@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:car_rental_app/screens/main_screen.dart';
 import 'package:car_rental_app/screens/register_screen.dart';
 import 'package:car_rental_app/providers/auth_provider.dart';
 
@@ -59,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleForgotPassword() {
-    // TODO: Implémenter la réinitialisation du mot de passe
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -74,7 +72,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           TextButton(
             onPressed: () {
-              // TODO: Envoyer l'email de réinitialisation
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(

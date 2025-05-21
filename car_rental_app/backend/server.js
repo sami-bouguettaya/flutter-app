@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const userRoutes = require('./routes/userRoutes');
+const carRoutes = require('./routes/carRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -16,8 +19,9 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/cars', require('./routes/carRoutes'));
-app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/users', userRoutes);
+app.use('/api/cars', carRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');

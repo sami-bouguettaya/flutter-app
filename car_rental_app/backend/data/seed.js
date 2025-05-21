@@ -15,30 +15,40 @@ const seedDatabase = async () => {
     await User.deleteMany({});
     await Car.deleteMany({});
 
+    // Créer l'utilisateur admin
+    const admin = await User.create({
+      nom: 'Administrateur',
+      email: 'admin@admin.com',
+      password: await bcrypt.hash('admin', 10),
+      telephone: '0000000000',
+      adresse: '123 Rue Admin',
+      role: 'admin'
+    });
+
     // Créer des utilisateurs de test
     const users = await User.create([
       {
-        username: 'john_doe',
+        nom: 'John Doe',
         email: 'john@example.com',
         password: await bcrypt.hash('password123', 10),
-        fullName: 'John Doe',
-        phone: '1234567890',
+        telephone: '1234567890',
+        adresse: '456 Rue Example',
         role: 'user'
       },
       {
-        username: 'jane_smith',
+        nom: 'Jane Smith',
         email: 'jane@example.com',
         password: await bcrypt.hash('password123', 10),
-        fullName: 'Jane Smith',
-        phone: '0987654321',
+        telephone: '0987654321',
+        adresse: '789 Rue Test',
         role: 'user'
       },
       {
-        username: 'bob_wilson',
+        nom: 'Bob Wilson',
         email: 'bob@example.com',
         password: await bcrypt.hash('password123', 10),
-        fullName: 'Bob Wilson',
-        phone: '5555555555',
+        telephone: '5555555555',
+        adresse: '321 Rue Sample',
         role: 'user'
       }
     ]);
@@ -55,6 +65,7 @@ const seedDatabase = async () => {
         image: 'https://example.com/toyota-corolla.jpg',
         owner: users[0]._id,
         available: true,
+        status: 'approved',
         features: ['Climatisation', 'GPS', 'Bluetooth'],
         ratings: [
           { user: users[1]._id, rating: 4, comment: 'Très bon état' },
@@ -71,6 +82,7 @@ const seedDatabase = async () => {
         image: 'https://example.com/bmw-serie3.jpg',
         owner: users[1]._id,
         available: true,
+        status: 'pending',
         features: ['Climatisation', 'GPS', 'Bluetooth', 'Caméra de recul'],
         ratings: [
           { user: users[0]._id, rating: 5, comment: 'Superbe voiture' }
@@ -86,6 +98,7 @@ const seedDatabase = async () => {
         image: 'https://example.com/renault-clio.jpg',
         owner: users[2]._id,
         available: true,
+        status: 'rejected',
         features: ['Climatisation', 'Bluetooth'],
         ratings: []
       }
